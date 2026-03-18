@@ -15,4 +15,4 @@ select.addEventListener('change', () => {
 // Сохраняем цвет
 colorPicker.addEventListener('input', () => {
     chrome.storage.sync.set({ translationColor: colorPicker.value });
-});
+}); 
