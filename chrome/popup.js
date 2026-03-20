@@ -3,6 +3,7 @@ const colorPicker = document.getElementById('colorPicker');
 
 // Загружаем сохраненные настройки
 chrome.storage.sync.get(['targetLang', 'translationColor'], (result) => {
+    if (chrome.runtime.lastError) return;
     if (result.targetLang) select.value = result.targetLang;
     if (result.translationColor) colorPicker.value = result.translationColor;
 });

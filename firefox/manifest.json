@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Twitch Chat Translator",
-  "version": "1.1",
+  "version": "1.2",
   "author": "meno1337",
   "description": "Автоматический переводчик чата Twitch на русский язык.",
   "icons": {

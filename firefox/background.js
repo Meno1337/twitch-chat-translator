@@ -6,7 +6,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             .then(res => res.json())
             .then(data => {
                 const result = data[0].map(x => x[0]).join("");
-                sendResponse({ translated: result });
+                const normalizeForCompare = (s) =>
+                    (s ?? "")
+                        .replace(/\u00A0/g, " ") // NBSP -> space
+                        .replace(/\s+/g, " ")  // collapse whitespace
+                        .trim()
+                        .toLowerCase();
+
+                const originalNorm = normalizeForCompare(message.text);
+                const resultNorm = normalizeForCompare(result);
+
+                // Если Google фактически вернул исходный текст (тот же язык),
+                // пропускаем вставку, чтобы не было "перевода ради перевода".
+                if (originalNorm && originalNorm === resultNorm) {
+                    sendResponse({ translated: null });
+                } else {
+                    sendResponse({ translated: result });
+                }
             })
             .catch(err => {
                 console.error("TCT Error:", err);
