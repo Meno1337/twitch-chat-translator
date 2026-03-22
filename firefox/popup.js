@@ -1,18 +1,36 @@
-const select = document.getElementById('langSelect');
+const api = typeof browser !== "undefined" ? browser : chrome;
+
+const langSelect = document.getElementById('langSelect');
 const colorPicker = document.getElementById('colorPicker');
+const toggle = document.getElementById('enableTranslation');
+const statusText = document.getElementById('statusText');
 
-// Загружаем сохраненные настройки
-chrome.storage.sync.get(['targetLang', 'translationColor'], (result) => {
-    if (result.targetLang) select.value = result.targetLang;
-    if (result.translationColor) colorPicker.value = result.translationColor;
+// Загрузка настроек
+api.storage.sync.get(['targetLang', 'translationColor', 'translationEnabled'], (data) => {
+    if (data.targetLang) langSelect.value = data.targetLang;
+    if (data.translationColor) colorPicker.value = data.translationColor;
+    
+    const enabled = data.translationEnabled !== false; // default true
+    toggle.checked = enabled;
+    updateStatus(enabled);
 });
 
-// Сохраняем язык
-select.addEventListener('change', () => {
-    chrome.storage.sync.set({ targetLang: select.value });
+function updateStatus(enabled) {
+    statusText.textContent = enabled ? 'Включён' : 'Выключен';
+    statusText.className = 'toggle-label' + (enabled ? ' enabled' : '');
+}
+
+// Сохранение
+langSelect.addEventListener('change', () => {
+    api.storage.sync.set({ targetLang: langSelect.value });
 });
 
-// Сохраняем цвет
 colorPicker.addEventListener('input', () => {
-    chrome.storage.sync.set({ translationColor: colorPicker.value });
-}); 
+    api.storage.sync.set({ translationColor: colorPicker.value });
+});
+
+toggle.addEventListener('change', () => {
+    const enabled = toggle.checked;
+    api.storage.sync.set({ translationEnabled: enabled });
+    updateStatus(enabled);
+});

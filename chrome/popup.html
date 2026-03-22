@@ -32,10 +32,71 @@
         .warning-text { color: #eb0400; font-weight: bold; font-size: 10px; margin-top: 5px; }
         h4 { margin: 0 0 12px 0; color: #efeff1; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         h4::before { content: "🌐"; }
+
+        /* Cloudflare-style toggle */
+.cf-toggle {
+    position: relative;
+    display: inline-block;
+    width: 54px;          /* чуть шире, как у Cloudflare */
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.cf-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.cf-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%); /* blue → purple */
+    border-radius: 28px;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+.cf-slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Выключено */
+input:not(:checked) + .cf-slider {
+    background: linear-gradient(90deg, #6b7280 0%, #9ca3af 100%); /* серый градиент off */
+}
+
+input:not(:checked) + .cf-slider:before {
+    transform: translateX(0);
+}
+
+/* Включено */
+input:checked + .cf-slider:before {
+    transform: translateX(26px); /* сдвиг вправо */
+}
+
+/* Лёгкий блик/эффект при наведении */
+.cf-toggle:hover .cf-slider {
+    filter: brightness(1.08);
+}
     </style>
 </head>
 <body>
-    <h4>Twitch Translator</h4>
+    <h4>Twitch Chat Translator v1.3</h4>
     
     <div class="section">
         <label>Язык перевода</label>
@@ -52,6 +113,20 @@
             <span>После смены языка <b>обновите страницу</b> стрима (F5)</span>
         </div>
     </div>
+
+    <div class="section">
+    <label style="display: block; margin-bottom: 8px;">Перевод чата</label>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <span id="statusText" style="font-size: 13px; font-weight: 500; color: #e5e7eb; min-width: 80px;">
+            Выключен
+        </span>
+        
+        <label class="cf-toggle">
+            <input type="checkbox" id="enableTranslation" checked>
+            <span class="cf-slider"></span>
+        </label>
+    </div>
+</div>
 
     <div class="section">
         <label>Цвет текста</label>

@@ -3,18 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { width: 230px; padding: 12px; font-family: 'Segoe UI', Tahoma, sans-serif; background: #18181b; color: #efeff1; }
-        .section { margin-bottom: 12px; border-bottom: 1px solid #35353b; padding-bottom: 10px; }
-        label { display: block; font-size: 11px; margin-bottom: 5px; color: #adadb8; text-transform: uppercase; letter-spacing: 0.5px; }
-        a { color: #9147ff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        body { 
+            width: 230px; 
+            padding: 12px; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: #18181b; 
+            color: #efeff1; 
+            margin: 0;
+        }
+        .section { 
+            margin-bottom: 12px; 
+            border-bottom: 1px solid #35353b; 
+            padding-bottom: 10px; 
+        }
+        label { 
+            display: block; 
+            font-size: 11px; 
+            margin-bottom: 5px; 
+            color: #adadb8; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+        }
+        a { 
+            color: #9147ff; 
+            text-decoration: none; 
+        }
+        a:hover { 
+            text-decoration: underline; 
+        }
         
         select, input[type="color"] { 
-            width: 100%; background: #0e0e10; color: white; 
-            border: 1px solid #464649; border-radius: 4px; 
-            padding: 6px; cursor: pointer; transition: border 0.2s;
+            width: 100%; 
+            background: #0e0e10; 
+            color: white; 
+            border: 1px solid #464649; 
+            border-radius: 4px; 
+            padding: 6px; 
+            cursor: pointer; 
+            transition: border 0.2s;
         }
-        select:focus, input[type="color"]:hover { border-color: #9147ff; outline: none; }
+        select:focus, input[type="color"]:hover { 
+            border-color: #9147ff; 
+            outline: none; 
+        }
 
         /* Плашка с предупреждением об обновлении */
         .refresh-notice {
@@ -30,14 +61,95 @@
             gap: 6px;
         }
 
-        .info { font-size: 11px; color: #adadb8; line-height: 1.4; margin-top: 10px; }
-        .warning-text { color: #eb0400; font-weight: bold; font-size: 10px; margin-top: 5px; }
-        h4 { margin: 0 0 12px 0; color: #efeff1; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-        h4::before { content: "🌐"; }
+        .info { 
+            font-size: 11px; 
+            color: #adadb8; 
+            line-height: 1.4; 
+            margin-top: 10px; 
+        }
+        .warning-text { 
+            color: #eb0400; 
+            font-weight: bold; 
+            font-size: 10px; 
+            margin-top: 5px; 
+        }
+        h4 { 
+            margin: 0 0 12px 0; 
+            color: #efeff1; 
+            font-size: 14px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        h4::before { 
+            content: "🌐"; 
+        }
+
+        /* ────────────────────────────────────────────────
+           Cloudflare-style toggle (WARP / Zero Trust look)
+        ──────────────────────────────────────────────── */
+        .toggle-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 6px 0;
+        }
+        .toggle-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #e5e7eb;
+            transition: color 0.3s ease;
+        }
+        .toggle-label.enabled {
+            color: #c4b5fd; /* лёгкий фиолетовый оттенок "Connected" */
+        }
+
+        .cf-toggle {
+            position: relative;
+            width: 54px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+        .cf-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .cf-slider {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+            border-radius: 9999px;
+            transition: background 0.4s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+        }
+        .cf-slider::before {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            left: 2px;
+            top: 2px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            transition: transform 0.42s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        input:checked + .cf-slider {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #8b5cf6 100%);
+        }
+        input:checked + .cf-slider::before {
+            transform: translateX(26px);
+        }
+        .cf-toggle:hover .cf-slider {
+            filter: brightness(1.08);
+        }
     </style>
 </head>
 <body>
-    <h4>Twitch Translator</h4>
+    <h4>Twitch Chat Translator v1.3</h4>
     
     <div class="section">
         <label>Язык перевода</label>
@@ -52,6 +164,18 @@
         <div class="refresh-notice">
             <span>ℹ️</span>
             <span>После смены языка <b>обновите страницу</b> стрима (F5)</span>
+        </div>
+    </div>
+
+    <!-- Новая секция с тумблером в стиле Cloudflare -->
+    <div class="section">
+        <label>Перевод чата</label>
+        <div class="toggle-section">
+            <span id="statusText" class="toggle-label">Выключен</span>
+            <label class="cf-toggle">
+                <input type="checkbox" id="enableTranslation" checked>
+                <span class="cf-slider"></span>
+            </label>
         </div>
     </div>
 
@@ -74,4 +198,4 @@
 
     <script src="popup.js"></script>
 </body>
-</html> 
+</html>
